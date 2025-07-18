@@ -26,6 +26,74 @@ create an wed where fisherman report plastic sightings or water quality issues, 
 ---
 
 ## ⚙️ Installation & Setup Instructions
+🧪 Requirements
+VS Code
+
+Live Server Extension
+
+Internet connection
+
+ThingSpeak Account
+
+ThingSpeak Public Channel: https://thingspeak.com/channels/3011293
+
+(Optional) Wokwi for simulation testing
+
+🔌 For Simulation Setup (Wokwi)
+Go to Wokwi.com
+
+Upload the following:
+
+sketch.ino
+
+diagram.json
+
+libraries.txt
+
+Click "Start Simulation"
+
+Add your ThingSpeak Write API Key in the code
+
+Check if data is updating on your ThingSpeak channel
+
+🌐 Website 1: Simulation-Connected Dashboard (web-dashboard)
+Open the web-dashboard folder in VS Code
+
+Right-click index.html → click “Open with Live Server”
+
+Features:
+
+📊 Live sensor readings (from ThingSpeak)
+
+📍 Real-time device location (map)
+
+🧠 Analytical reports
+
+⚠️ Ghost net alerts
+
+📝 Detection log
+
+🔧 Future hardware control integration
+
+🌐 Website 2: GhostNet Lite Dashboard (ghostnet-web)
+Open the ghostnetdetect.html file in VS Code
+
+Right-click → “Open with Live Server”
+
+Features:
+
+🌊 Displays marine data (Turbidity, TDS, pH, etc.)
+
+🧾 Log of sensor data
+
+📣 Voice alerts for detection (ghost net, animals, pollution)
+
+🌙 Dark/Light mode toggle
+
+📡 Pulls data from ThingSpeak channel 3011293
+
+
+
 
 
 
