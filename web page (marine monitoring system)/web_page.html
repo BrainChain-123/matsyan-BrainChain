@@ -1,0 +1,2825 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marine Monitoring System</title>
+    
+    <!-- External Dependencies -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Professional Green Theme CSS Variables */
+        :root {
+            --background: hsl(0, 0%, 100%);
+            --foreground: hsl(0, 0%, 15%);
+            --muted: hsl(0, 0%, 96%);
+            --muted-foreground: hsl(0, 0%, 45%);
+            --card: hsl(0, 0%, 100%);
+            --card-foreground: hsl(0, 0%, 15%);
+            --border: hsl(0, 0%, 90%);
+            --input: hsl(0, 0%, 90%);
+            --primary: hsl(142, 71%, 45%);
+            --primary-foreground: hsl(0, 0%, 100%);
+            --secondary: hsl(0, 0%, 96%);
+            --secondary-foreground: hsl(0, 0%, 15%);
+            --accent: hsl(0, 0%, 96%);
+            --accent-foreground: hsl(0, 0%, 15%);
+            --destructive: hsl(0, 84%, 60%);
+            --destructive-foreground: hsl(0, 0%, 100%);
+            --ring: hsl(142, 71%, 45%);
+            --radius: 0.5rem;
+            
+            /* Green Theme Colors */
+            --green-50: hsl(138, 76%, 97%);
+            --green-100: hsl(141, 84%, 93%);
+            --green-200: hsl(141, 79%, 85%);
+            --green-300: hsl(142, 76%, 73%);
+            --green-400: hsl(142, 71%, 45%);
+            --green-500: hsl(142, 76%, 36%);
+            --green-600: hsl(142, 72%, 29%);
+            --green-700: hsl(142, 69%, 24%);
+            --green-800: hsl(143, 65%, 20%);
+            --green-900: hsl(144, 61%, 15%);
+        }
+
+        .dark {
+            --background: hsl(0, 0%, 15%);
+            --foreground: hsl(0, 0%, 100%);
+            --muted: hsl(0, 0%, 20%);
+            --muted-foreground: hsl(0, 0%, 65%);
+            --card: hsl(0, 0%, 15%);
+            --card-foreground: hsl(0, 0%, 100%);
+            --border: hsl(0, 0%, 20%);
+            --input: hsl(0, 0%, 20%);
+            --primary: hsl(142, 71%, 45%);
+            --primary-foreground: hsl(0, 0%, 100%);
+            --secondary: hsl(0, 0%, 20%);
+            --secondary-foreground: hsl(0, 0%, 100%);
+            --accent: hsl(0, 0%, 20%);
+            --accent-foreground: hsl(0, 0%, 100%);
+            --destructive: hsl(0, 84%, 60%);
+            --destructive-foreground: hsl(0, 0%, 100%);
+            --ring: hsl(142, 71%, 45%);
+        }
+
+        /* Base Styles */
+        * {
+            border-color: var(--border);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Component Styles */
+        .card {
+            background: var(--card);
+            color: var(--card-foreground);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .btn-primary:hover {
+            background: hsl(142, 71%, 40%);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--secondary-foreground);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent);
+        }
+
+        .btn-destructive {
+            background: var(--destructive);
+            color: var(--destructive-foreground);
+        }
+
+        .btn-success {
+            background: var(--green-500);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: var(--green-600);
+        }
+
+        .input {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--background);
+            color: var(--foreground);
+            font-size: 0.875rem;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px hsla(142, 71%, 45%, 0.2);
+        }
+
+        .textarea {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--background);
+            color: var(--foreground);
+            font-size: 0.875rem;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px hsla(142, 71%, 45%, 0.2);
+        }
+
+        /* Map Container */
+        .leaflet-container {
+            height: 100%;
+            width: 100%;
+            border-radius: var(--radius);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-info {
+            background: hsl(142, 71%, 95%);
+            color: hsl(142, 71%, 25%);
+            border: 1px solid hsl(142, 71%, 85%);
+        }
+
+        .alert-warning {
+            background: hsl(45, 100%, 95%);
+            color: hsl(45, 100%, 25%);
+            border: 1px solid hsl(45, 100%, 85%);
+        }
+
+        .alert-error {
+            background: hsl(0, 84%, 95%);
+            color: hsl(0, 84%, 25%);
+            border: 1px solid hsl(0, 84%, 85%);
+        }
+
+        .alert-success {
+            background: hsl(142, 76%, 95%);
+            color: hsl(142, 76%, 25%);
+            border: 1px solid hsl(142, 76%, 85%);
+        }
+
+        /* Badge Styles */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: hsl(142, 76%, 90%);
+            color: hsl(142, 76%, 20%);
+        }
+
+        .badge-warning {
+            background: hsl(45, 100%, 90%);
+            color: hsl(45, 100%, 20%);
+        }
+
+        .badge-error {
+            background: hsl(0, 84%, 90%);
+            color: hsl(0, 84%, 20%);
+        }
+
+        .badge-info {
+            background: hsl(142, 71%, 90%);
+            color: hsl(142, 71%, 20%);
+        }
+
+        /* Pulse Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Custom Scrollbar */
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: var(--muted);
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: var(--muted-foreground);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+            .grid-cols-2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+            .grid-cols-3 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+            .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        /* Tab Styles */
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--background);
+            color: var(--foreground);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-button.active {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border-color: var(--primary);
+        }
+
+        .tab-button:hover {
+            background: var(--accent);
+        }
+
+        /* Table Styles */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table th {
+            background: var(--muted);
+            font-weight: 600;
+        }
+
+        .table tr:hover {
+            background: var(--muted);
+        }
+
+        /* Ghost Net Marker */
+        .ghost-net-marker {
+            background: none !important;
+            border: none !important;
+        }
+
+        /* Boat Marker */
+        .boat-marker {
+            background: none !important;
+            border: none !important;
+        }
+
+        /* Switch Styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--muted);
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 2px solid var(--muted);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--muted);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background-color: var(--green-500);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+        }
+
+        .status-warning {
+            background-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+        }
+
+        .status-offline {
+            background-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Report Form Styles */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-required {
+            color: #ef4444;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background-color: var(--muted);
+        }
+
+        .file-upload.dragover {
+            border-color: var(--primary);
+            background-color: var(--green-50);
+        }
+
+        /* Report Status Styles */
+        .report-status {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .report-status.pending {
+            background: hsl(45, 100%, 90%);
+            color: hsl(45, 100%, 20%);
+        }
+
+        .report-status.investigating {
+            background: hsl(142, 71%, 90%);
+            color: hsl(142, 71%, 20%);
+        }
+
+        .report-status.resolved {
+            background: hsl(142, 76%, 90%);
+            color: hsl(142, 76%, 20%);
+        }
+
+        .report-status.closed {
+            background: hsl(0, 0%, 90%);
+            color: hsl(0, 0%, 40%);
+        }
+
+        /* Notification Styles */
+        .notification-panel {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: var(--muted);
+        }
+
+        .notification-item.unread {
+            background-color: var(--green-50);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--green-600), var(--green-800));
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-nav a {
+            color: white;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .header-nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .header-icon-btn {
+            color: white;
+            opacity: 0.8;
+            transition: all 0.2s;
+        }
+
+        .header-icon-btn:hover {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-avatar {
+            background-color: var(--green-400);
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, var(--green-800), var(--green-900));
+            color: white;
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 9999px;
+            width: 1.25rem;
+            height: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Detection Details Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--background);
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Map Popup Styles */
+        .map-popup {
+            min-width: 250px;
+        }
+
+        /* Notification Tab Styles */
+        .notification-tab {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .notification-tab-button {
+            padding: 0.75rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            position: relative;
+            font-weight: 500;
+            color: var(--muted-foreground);
+        }
+
+        .notification-tab-button.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .notification-tab-button .badge {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            <h1 class="text-xl font-bold text-white">Marine Monitoring System</h1>
+                        </div>
+                        <nav class="hidden md:flex space-x-4 header-nav">
+                            <a href="#" data-tab="dashboard" class="text-sm font-medium">Dashboard</a>
+                            <a href="#" data-tab="ghost-net-reporting" class="text-sm font-medium">Reports</a>
+                            <a href="#" data-tab="analytics-reports" class="text-sm font-medium">Analytics</a>
+                            <a href="#" data-tab="device-control" class="text-sm font-medium">Devices</a>
+                            <a href="#" data-tab="notifications" class="text-sm font-medium">Notifications</a>
+                        </nav>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button id="theme-toggle" class="p-2 rounded-full header-icon-btn">
+                            <svg id="sun-icon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <svg id="moon-icon" class="h-5 w-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                        </button>
+                        <div class="relative">
+                            <button id="notifications-btn" class="p-2 rounded-full header-icon-btn">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                </svg>
+                                <span id="alert-count" class="notification-badge">3</span>
+                            </button>
+                        </div>
+                        <button id="settings-btn" class="p-2 rounded-full header-icon-btn">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </button>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-full header-avatar flex items-center justify-center text-white font-medium">AD</div>
+                            <span class="hidden md:inline text-sm font-medium text-white">Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1">
+            <!-- Alerts Section -->
+            <div id="alerts-container" class="mb-6 space-y-3">
+                <!-- Alerts will be populated here -->
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="flex space-x-2 mb-6 overflow-x-auto">
+                <button data-tab="dashboard" class="tab-button active">Dashboard</button>
+                <button data-tab="ghost-net-reporting" class="tab-button">Ghost Net Reporting</button>
+                <button data-tab="analytics-reports" class="tab-button">Analytics & Reports</button>
+                <button data-tab="device-control" class="tab-button">Device Control</button>
+                <button data-tab="notifications" class="tab-button">Notifications</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="space-y-6">
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Map Section -->
+                        <div class="card lg:col-span-2 p-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-bold">Marine Monitoring Map</h2>
+                                <div class="flex space-x-2">
+                                    <label class="flex items-center space-x-2 text-sm">
+                                        <span>Auto-refresh</span>
+                                        <div class="switch">
+                                            <input type="checkbox" id="auto-refresh" checked>
+                                            <span class="slider"></span>
+                                        </div>
+                                    </label>
+                                    <button id="refresh-map" class="btn btn-secondary text-sm">
+                                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="map" class="h-96 rounded-lg overflow-hidden"></div>
+                        </div>
+
+                        <!-- Sensor Data Section -->
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-bold">Sensor Data</h2>
+                                <div class="flex space-x-2">
+                                    <select id="buoy-select" class="input text-sm">
+                                        <option value="all">All Buoys</option>
+                                        <option value="B-032">B-032 (Mumbai)</option>
+                                        <option value="B-015">B-015 (Chennai)</option>
+                                        <option value="B-028">B-028 (Goa)</option>
+                                        <option value="B-067">B-067 (Vizag)</option>
+                                    </select>
+                                    <select id="sensor-select" class="input text-sm">
+                                        <option value="turbidity">Turbidity</option>
+                                        <option value="temperature">Temperature</option>
+                                        <option value="pressure">Pressure</option>
+                                        <option value="salinity">Salinity</option>
+                                        <option value="tds">TDS</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="sensor-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Detection Logs Section -->
+                        <div class="card lg:col-span-3 p-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-bold">Detection Logs</h2>
+                                <div class="flex space-x-2">
+                                    <select id="region-select" class="input text-sm">
+                                        <option value="all">All Regions</option>
+                                        <option value="mumbai">Mumbai</option>
+                                        <option value="chennai">Chennai</option>
+                                        <option value="goa">Goa</option>
+                                        <option value="vizag">Vizag</option>
+                                    </select>
+                                    <button id="filter-logs" class="btn btn-primary text-sm">
+                                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                                        </svg>
+                                        Filter
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Buoy ID</th>
+                                            <th>Type</th>
+                                            <th>Region</th>
+                                            <th>Severity</th>
+                                            <th>Location</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detection-logs-tbody">
+                                        <!-- Logs will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ghost Net Reporting Tab -->
+                <div id="ghost-net-reporting" class="tab-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Report Form -->
+                        <div class="card lg:col-span-2 p-4">
+                            <h2 class="text-lg font-bold mb-4">Ghost Net Report</h2>
+                            <form id="ghost-net-report-form">
+                                <!-- Reporter Information -->
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Your Name <span class="form-required">*</span></label>
+                                        <input type="text" id="reporter-name" class="input w-full" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Phone Number <span class="form-required">*</span></label>
+                                        <input type="tel" id="reporter-phone" class="input w-full" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Organization</label>
+                                        <input type="text" id="reporter-org" class="input w-full">
+                                    </div>
+                                </div>
+
+                                <!-- Detection Information -->
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Region <span class="form-required">*</span></label>
+                                        <select id="detection-region" class="input w-full" required>
+                                            <option value="">Select Region</option>
+                                            <option value="mumbai">Mumbai Coast</option>
+                                            <option value="chennai">Chennai Bay</option>
+                                            <option value="goa">Goa Waters</option>
+                                            <option value="vizag">Vizag Harbor</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Latitude <span class="form-required">*</span></label>
+                                        <input type="number" step="0.000001" id="detection-lat" class="input w-full" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Longitude <span class="form-required">*</span></label>
+                                        <input type="number" step="0.000001" id="detection-lng" class="input w-full" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <button type="button" id="get-current-location" class="btn btn-secondary">
+                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        Use Current Location
+                                    </button>
+                                </div>
+
+                                <!-- Ghost Net Details -->
+                                <div class="form-group">
+                                    <label class="form-label">Ghost Net Size <span class="form-required">*</span></label>
+                                    <select id="net-size" class="input w-full" required>
+                                        <option value="">Select Size</option>
+                                        <option value="small">Small (< 10m)</option>
+                                        <option value="medium">Medium (10-50m)</option>
+                                        <option value="large">Large (50-100m)</option>
+                                        <option value="massive">Massive (> 100m)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Severity Level <span class="form-required">*</span></label>
+                                    <select id="severity-level" class="input w-full" required>
+                                        <option value="">Select Severity</option>
+                                        <option value="low">Low - Minimal marine life impact</option>
+                                        <option value="medium">Medium - Moderate threat to marine life</option>
+                                        <option value="high">High - Immediate threat to marine ecosystem</option>
+                                        <option value="critical">Critical - Emergency response required</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Marine Life Impact</label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="impact-fish" class="mr-2">
+                                            <span class="text-sm">Fish entanglement observed</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="impact-turtle" class="mr-2">
+                                            <span class="text-sm">Sea turtle entanglement</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="impact-coral" class="mr-2">
+                                            <span class="text-sm">Coral reef damage</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="impact-other" class="mr-2">
+                                            <span class="text-sm">Other marine life affected</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Description <span class="form-required">*</span></label>
+                                    <textarea id="net-description" class="textarea w-full" required placeholder="Detailed description of the ghost net, its condition, surrounding environment, and any immediate threats observed..."></textarea>
+                                </div>
+
+                                <!-- Photo Upload -->
+                                <div class="form-group">
+                                    <label class="form-label">Photo Evidence</label>
+                                    <div id="photo-upload" class="file-upload">
+                                        <svg class="h-12 w-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <p class="text-sm text-gray-600">Click to upload photos or drag and drop</p>
+                                        <p class="text-xs text-gray-500 mt-1">PNG, JPG up to 10MB each</p>
+                                        <input type="file" id="photo-input" multiple accept="image/*" class="hidden">
+                                    </div>
+                                    <div id="photo-preview" class="mt-2 grid grid-cols-2 gap-2"></div>
+                                </div>
+
+                                <!-- Emergency Contact -->
+                                <div class="form-group">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="emergency-contact" class="mr-2">
+                                        <span class="text-sm font-medium text-red-600">This is an emergency requiring immediate response</span>
+                                    </label>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="form-group">
+                                    <button type="submit" id="submit-report" class="btn btn-destructive w-full">
+                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                        </svg>
+                                        Submit Ghost Net Report
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Report Status & Notifications -->
+                        <div class="space-y-6">
+                            <!-- Quick Actions -->
+                            <div class="card p-4">
+                                <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
+                                <div class="space-y-2">
+                                    <button id="emergency-hotline" class="btn btn-destructive w-full">
+                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                        </svg>
+                                        Emergency Hotline: 1800-XXX-XXXX
+                                    </button>
+                                    <button id="coast-guard-direct" class="btn btn-primary w-full">
+                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        Contact Coast Guard Directly
+                                    </button>
+                                    <button id="nearby-vessels" class="btn btn-secondary w-full">
+                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Alert Nearby Vessels
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Recent Reports -->
+                            <div class="card p-4">
+                                <h3 class="text-lg font-bold mb-4">Recent Reports</h3>
+                                <div id="recent-reports" class="space-y-3">
+                                    <!-- Recent reports will be populated here -->
+                                </div>
+                            </div>
+
+                            <!-- Coastal Authority Notifications -->
+                            <div class="card p-4">
+                                <h3 class="text-lg font-bold mb-4">Authority Notifications</h3>
+                                <div id="authority-notifications" class="notification-panel">
+                                    <!-- Notifications will be populated here -->
+                                </div>
+                            </div>
+
+                            <!-- Response Guidelines -->
+                            <div class="card p-4">
+                                <h3 class="text-lg font-bold mb-4">Response Guidelines</h3>
+                                <div class="space-y-3 text-sm">
+                                    <div class="alert alert-error">
+                                        <strong>Critical/High Severity:</strong> Immediate Coast Guard dispatch, emergency response teams activated within 30 minutes.
+                                    </div>
+                                    <div class="alert alert-warning">
+                                        <strong>Medium Severity:</strong> Response team deployment within 2-4 hours, local authorities notified.
+                                    </div>
+                                    <div class="alert alert-info">
+                                        <strong>Low Severity:</strong> Scheduled removal within 24-48 hours, monitoring continued.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics & Reports Tab -->
+                <div id="analytics-reports" class="tab-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Environmental Trends -->
+                        <div class="card p-4">
+                            <h3 class="text-lg font-bold mb-4">Environmental Trends</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-medium">Water Temperature</span>
+                                        <span class="text-sm text-green-600">+2.3°C</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-medium">Turbidity Levels</span>
+                                        <span class="text-sm text-yellow-600">+15 NTU</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-medium">Salinity</span>
+                                        <span class="text-sm text-blue-600">35.2 PSU</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detection Statistics -->
+                        <div class="card p-4">
+                            <h3 class="text-lg font-bold mb-4">Detection Statistics</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-red-600" id="total-detections">23</div>
+                                    <div class="text-sm text-gray-600">Ghost Nets Detected</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-green-600" id="successful-removals">18</div>
+                                    <div class="text-sm text-gray-600">Successfully Removed</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-yellow-600" id="pending-removals">5</div>
+                                    <div class="text-sm text-gray-600">Pending Removal</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-blue-600" id="success-rate">78%</div>
+                                    <div class="text-sm text-gray-600">Success Rate</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Marine Life Impact -->
+                        <div class="card p-4">
+                            <h3 class="text-lg font-bold mb-4">Marine Life Impact Assessment</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm">Fish Population</span>
+                                    <span class="badge badge-success">Stable</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm">Coral Health</span>
+                                    <span class="badge badge-warning">Moderate Risk</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm">Water Quality</span>
+                                    <span class="badge badge-success">Good</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm">Biodiversity Index</span>
+                                    <span class="badge badge-success">High</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Predictive Analytics -->
+                        <div class="card p-4">
+                            <h3 class="text-lg font-bold mb-4">Predictive Analytics</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="text-sm font-medium mb-1">Ghost Net Risk Forecast</div>
+                                    <div class="text-xs text-gray-600 mb-2">Next 7 days</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill bg-yellow-500" style="width: 65%"></div>
+                                    </div>
+                                    <div class="text-xs text-yellow-600 mt-1">Medium Risk - Monitor closely</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium mb-1">Weather Impact</div>
+                                    <div class="text-xs text-gray-600 mb-2">Storm season approaching</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill bg-red-500" style="width: 80%"></div>
+                                    </div>
+                                    <div class="text-xs text-red-600 mt-1">High Impact Expected</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Device Control Tab -->
+                <div id="device-control" class="tab-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card p-4">
+                            <h3 class="text-lg font-bold mb-4">Buoy Operations</h3>
+                            <div class="space-y-3">
+                                <button id="restart-buoy" class="btn btn-primary w-full">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Restart Buoy
+                                </button>
+                                <button id="calibrate-sensors" class="btn btn-secondary w-full">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                                    </svg>
+                                    Calibrate Sensors
+                                </button>
+                                <button id="update-firmware" class="btn btn-secondary w-full">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 01 0 10h-1m-1 0h1a5 5 0 0017.9-2A5 5 0 0016 6h-1m-1 0h1a5 5 0 0117.9-2A5 5 0 0116 6h-1"></path>
+                                    </svg>
+                                    Update Firmware
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card p-4">
+                            <h3 class="text-lg font-bold mb-4">Emergency Response</h3>
+                            <div class="space-y-3">
+                                <button id="send-patrol" class="btn btn-destructive w-full">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                    </svg>
+                                    Send Emergency Patrol
+                                </button>
+                                <button id="deploy-retrieval" class="btn btn-primary w-full">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Deploy Retrieval Team
+                                </button>
+                                <button id="notify-authorities" class="btn btn-secondary w-full">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                                    </svg>
+                                    Notify All Authorities
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card lg:col-span-2 p-4">
+                            <h3 class="text-lg font-bold mb-4">Communication Log</h3>
+                            <div class="space-y-3">
+                                <div class="alert alert-info">
+                                    <div class="flex justify-between">
+                                        <span>14:32 - System</span>
+                                        <span class="text-xs">2 mins ago</span>
+                                    </div>
+                                    <div class="text-sm mt-1">Buoy B-032 firmware updated to v2.3.1</div>
+                                </div>
+                                <div class="alert alert-success">
+                                    <div class="flex justify-between">
+                                        <span>14:28 - Admin</span>
+                                        <span class="text-xs">6 mins ago</span>
+                                    </div>
+                                    <div class="text-sm mt-1">Calibration completed for buoy B-015</div>
+                                </div>
+                                <div class="alert alert-warning">
+                                    <div class="flex justify-between">
+                                        <span>14:15 - System</span>
+                                        <span class="text-xs">19 mins ago</span>
+                                    </div>
+                                    <div class="text-sm mt-1">Low battery warning for buoy B-028 (23%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Tab -->
+                <div id="notifications" class="tab-content hidden">
+                    <div class="card p-4">
+                        <div class="notification-tab">
+                            <button data-notification-tab="alerts" class="notification-tab-button active">
+                                Alerts
+                                <span id="alerts-badge" class="badge badge-error hidden">0</span>
+                            </button>
+                            <button data-notification-tab="reports" class="notification-tab-button">
+                                Reports
+                                <span id="reports-badge" class="badge badge-info hidden">0</span>
+                            </button>
+                            <button data-notification-tab="authorities" class="notification-tab-button">
+                                Authorities
+                                <span id="authorities-badge" class="badge badge-success hidden">0</span>
+                            </button>
+                            <button data-notification-tab="system" class="notification-tab-button">
+                                System
+                                <span id="system-badge" class="badge badge-warning hidden">0</span>
+                            </button>
+                        </div>
+                        
+                        <div id="alerts-notifications" class="notification-panel mt-4">
+                            <!-- Alerts notifications will be populated here -->
+                        </div>
+                        
+                        <div id="reports-notifications" class="notification-panel mt-4 hidden">
+                            <!-- Reports notifications will be populated here -->
+                        </div>
+                        
+                        <div id="authorities-notifications-tab" class="notification-panel mt-4 hidden">
+                            <!-- Authorities notifications will be populated here -->
+                        </div>
+                        
+                        <div id="system-notifications" class="notification-panel mt-4 hidden">
+                            <!-- System notifications will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">Marine Monitoring System</h3>
+                        <p class="text-sm opacity-80">A comprehensive platform for detecting and managing ghost nets in Indian coastal waters.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-md font-bold mb-4">Quick Links</h4>
+                        <ul class="space-y-2 footer-links">
+                            <li><a href="#" data-tab="dashboard">Dashboard</a></li>
+                            <li><a href="#" data-tab="ghost-net-reporting">Report Ghost Net</a></li>
+                            <li><a href="#" data-tab="analytics-reports">Analytics</a></li>
+                            <li><a href="#" data-tab="device-control">Device Control</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-md font-bold mb-4">Resources</h4>
+                        <ul class="space-y-2 footer-links">
+                            <li><a href="#">Documentation</a></li>
+                            <li><a href="#">API Reference</a></li>
+                            <li><a href="#">Training Materials</a></li>
+                            <li><a href="#">Research Papers</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-md font-bold mb-4">Contact</h4>
+                        <ul class="space-y-2 footer-links">
+                            <li>Ministry of Earth Sciences</li>
+                            <li>New Delhi, India</li>
+                            <li>Email: info@marine-monitoring.in</li>
+                            <li>Phone: +91 11 2345 6789</li>
+                            <li>Emergency: 1800-XXX-XXXX</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-green-700 mt-8 pt-6 text-sm text-center opacity-70">
+                    <p>&copy; 2024 Marine Monitoring System. All rights reserved. Developed by the Ministry of Earth Sciences, Government of India.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold">Settings</h2>
+                    <button id="close-settings" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Theme</label>
+                        <div class="flex space-x-4">
+                            <button class="btn btn-secondary">Light</button>
+                            <button class="btn btn-secondary">Dark</button>
+                            <button class="btn btn-primary">System</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Map Style</label>
+                        <select class="input w-full">
+                            <option>Satellite</option>
+                            <option>Terrain</option>
+                            <option>Roadmap</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="switch">
+                            <span class="text-sm">Enable Notifications</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="switch" checked>
+                            <span class="text-sm">Auto-refresh Data</span>
+                        </label>
+                    </div>
+                    <div class="pt-4 border-t border-gray-200 dark:border-slate-700">
+                        <button class="btn btn-primary w-full">Save Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detection Details Modal -->
+        <div id="detection-details-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Detection Details</h2>
+                        <button id="close-detection-details" class="text-gray-500 hover:text-gray-700">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="detection-details-content">
+                        <!-- Content will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class MarineMonitoringSystem {
+            constructor() {
+                this.isDarkMode = false;
+                this.autoRefresh = true;
+                this.selectedSensor = 'turbidity';
+                this.selectedBuoy = 'all';
+                this.selectedRegion = 'all';
+                this.map = null;
+                this.chart = null;
+                this.alerts = [];
+                this.ghostNetReports = [];
+                this.detectionLogs = [];
+                this.authorityNotifications = [];
+                this.systemNotifications = [];
+                this.currentTab = 'dashboard';
+
+                this.initializeMap();
+                this.initializeChart();
+                this.setupEventListeners();
+                this.setupGhostNetReporting();
+                this.loadInitialData();
+                this.startAutoRefresh();
+            }
+
+            initializeMap() {
+                try {
+                    // Initialize map centered on India
+                    this.map = L.map('map').setView([20.5937, 78.9629], 5);
+
+                    // Add tile layer (OpenStreetMap)
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(this.map);
+
+                    // Add buoys with sensor data (positioned in water)
+                    const buoys = [
+                        { id: 'B-032', name: 'Mumbai Monitor', lat: 18.916090, lng: 72.827426, status: 'online', battery: 87, temp: 28.5, turbidity: 45.2, region: 'mumbai' },
+                        { id: 'B-015', name: 'Chennai Observer', lat: 13.027439, lng: 80.267617, status: 'warning', battery: 42, temp: 29.1, turbidity: 65.7, region: 'chennai' },
+                        { id: 'B-028', name: 'Goa Sentinel', lat: 15.259326, lng: 73.923996, status: 'online', battery: 78, temp: 27.8, turbidity: 38.9, region: 'goa' },
+                        { id: 'B-067', name: 'Vizag Monitor', lat: 17.636816, lng: 83.258482, status: 'offline', battery: 23, temp: 28.9, turbidity: 41.5, region: 'vizag' }
+                    ];
+
+                    // Add buoy markers
+                    buoys.forEach(buoy => {
+                        const color = buoy.status === 'online' ? '#10b981' : 
+                                     buoy.status === 'warning' ? '#f59e0b' : '#ef4444';
+                        
+                        const marker = L.circleMarker([buoy.lat, buoy.lng], {
+                            color: color,
+                            fillColor: color,
+                            fillOpacity: 0.8,
+                            radius: 10,
+                            weight: 3
+                        }).addTo(this.map);
+
+                        marker.bindPopup(`
+                            <div class="p-3 min-w-48">
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <svg class="h-5 w-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                    <h3 class="font-bold text-lg">${buoy.name}</h3>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>ID:</span>
+                                        <span class="font-medium">${buoy.id}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Status:</span>
+                                        <span class="font-semibold" style="color: ${color}">${buoy.status.toUpperCase()}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Battery:</span>
+                                        <span class="font-medium">${buoy.battery}%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Temperature:</span>
+                                        <span class="font-medium">${buoy.temp}°C</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Turbidity:</span>
+                                        <span class="font-medium">${buoy.turbidity} NTU</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Region:</span>
+                                        <span class="font-medium">${buoy.region.toUpperCase()}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Coordinates:</span>
+                                        <span class="font-medium">${buoy.lat.toFixed(4)}, ${buoy.lng.toFixed(4)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    });
+
+                    // Add ghost net markers across all regions (positioned in water)
+                    const ghostNets = [
+                        // Mumbai Coast
+                        { id: 'GN-001', lat: 18.906090, lng: 72.807426, severity: 'high', size: 'large', region: 'mumbai', timestamp: '2024-01-15T14:23:00Z', status: 'active' },
+                        { id: 'GN-002', lat: 18.946090, lng: 72.847426, severity: 'medium', size: 'medium', region: 'mumbai', timestamp: '2024-01-14T10:20:00Z', status: 'investigating' },
+                        { id: 'GN-009', lat: 18.926090, lng: 72.817426, severity: 'critical', size: 'massive', region: 'mumbai', timestamp: '2024-01-16T09:15:00Z', status: 'active' },
+                        
+                        // Goa Waters
+                        { id: 'GN-003', lat: 15.239326, lng: 73.903996, severity: 'high', size: 'massive', region: 'goa', timestamp: '2024-01-15T12:30:00Z', status: 'active' },
+                        { id: 'GN-004', lat: 15.279326, lng: 73.943996, severity: 'low', size: 'small', region: 'goa', timestamp: '2024-01-13T08:45:00Z', status: 'resolved' },
+                        { id: 'GN-010', lat: 15.259326, lng: 73.923996, severity: 'medium', size: 'large', region: 'goa', timestamp: '2024-01-16T11:30:00Z', status: 'active' },
+                        
+                        // Chennai Bay
+                        { id: 'GN-005', lat: 13.017439, lng: 80.247617, severity: 'medium', size: 'large', region: 'chennai', timestamp: '2024-01-15T13:45:00Z', status: 'investigating' },
+                        { id: 'GN-006', lat: 13.047439, lng: 80.277617, severity: 'high', size: 'medium', region: 'chennai', timestamp: '2024-01-14T16:45:00Z', status: 'closed' },
+                        { id: 'GN-011', lat: 13.037439, lng: 80.267617, severity: 'critical', size: 'massive', region: 'chennai', timestamp: '2024-01-16T14:45:00Z', status: 'active' },
+                        
+                        // Vizag Harbor
+                        { id: 'GN-007', lat: 17.626816, lng: 83.228482, severity: 'low', size: 'small', region: 'vizag', timestamp: '2024-01-15T11:15:00Z', status: 'resolved' },
+                        { id: 'GN-008', lat: 17.666816, lng: 83.268482, severity: 'medium', size: 'large', region: 'vizag', timestamp: '2024-01-12T09:30:00Z', status: 'closed' },
+                        { id: 'GN-012', lat: 17.646816, lng: 83.248482, severity: 'high', size: 'massive', region: 'vizag', timestamp: '2024-01-16T10:15:00Z', status: 'active' }
+                    ];
+
+                    ghostNets.forEach((net, index) => {
+                        const color = net.severity === 'high' || net.severity === 'critical' ? '#ef4444' : 
+                                     net.severity === 'medium' ? '#f59e0b' : '#10b981';
+                        const size = net.size === 'massive' ? 16 : 
+                                    net.size === 'large' ? 12 : 
+                                    net.size === 'medium' ? 10 : 8;
+
+                        const marker = L.marker([net.lat, net.lng], {
+                            icon: L.divIcon({
+                                html: `
+                                    <div style="
+                                        width: ${size}px;
+                                        height: ${size}px;
+                                        background: ${color};
+                                        border: 2px solid white;
+                                        border-radius: 3px;
+                                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                                        animation: pulse 2s infinite;
+                                    "></div>
+                                    <style>
+                                        @keyframes pulse {
+                                            0%, 100% { opacity: 1; transform: scale(1); }
+                                            50% { opacity: 0.7; transform: scale(1.1); }
+                                        }
+                                    </style>
+                                `,
+                                className: 'ghost-net-marker',
+                                iconSize: [size, size],
+                                iconAnchor: [size/2, size/2]
+                            })
+                        }).addTo(this.map);
+
+                        marker.bindPopup(`
+                            <div class="p-3 min-w-48">
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                    <h3 class="font-bold text-red-600">Ghost Net Detected</h3>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>ID:</span>
+                                        <span class="font-medium">${net.id}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Region:</span>
+                                        <span class="font-medium">${net.region.toUpperCase()}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Size:</span>
+                                        <span class="font-medium">${net.size}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Severity:</span>
+                                        <span class="font-semibold" style="color: ${color}">${net.severity.toUpperCase()}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Status:</span>
+                                        <span class="font-medium">${net.status.charAt(0).toUpperCase() + net.status.slice(1)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Detected:</span>
+                                        <span class="font-medium">${new Date(net.timestamp).toLocaleString()}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Coordinates:</span>
+                                        <span class="font-medium">${net.lat.toFixed(4)}, ${net.lng.toFixed(4)}</span>
+                                    </div>
+                                    <div class="mt-3 space-y-1">
+                                        <button onclick="app.reportGhostNet(${net.lat}, ${net.lng}, '${net.region}')" class="btn btn-destructive text-xs w-full">Report This Net</button>
+                                        <button onclick="app.deployResponse(${net.lat}, ${net.lng})" class="btn btn-primary text-xs w-full">Deploy Response</button>
+                                        <button onclick="app.showDetectionDetails('${net.id}')" class="btn btn-secondary text-xs w-full">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    });
+
+                    // Add patrol boats (positioned in water)
+                    const boats = [
+                        { id: 'V-001', lat: 18.926090, lng: 72.837426, type: 'patrol', name: 'Coast Guard Alpha', region: 'mumbai', status: 'active' },
+                        { id: 'V-002', lat: 15.249326, lng: 73.913996, type: 'fishing', name: 'Fishing Vessel Beta', region: 'goa', status: 'active' },
+                        { id: 'V-003', lat: 13.027439, lng: 80.257617, type: 'research', name: 'Research Vessel Gamma', region: 'chennai', status: 'active' }
+                    ];
+
+                    boats.forEach(boat => {
+                        const color = boat.type === 'patrol' ? '#3b82f6' : 
+                                     boat.type === 'fishing' ? '#10b981' : '#8b5cf6';
+                        
+                        const icon = L.divIcon({
+                            html: `
+                                <div style="
+                                    width: 24px;
+                                    height: 24px;
+                                    background: ${color};
+                                    border: 2px solid white;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    color: white;
+                                    font-weight: bold;
+                                    font-size: 10px;
+                                ">${boat.type.charAt(0).toUpperCase()}</div>
+                            `,
+                            className: 'boat-marker',
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12]
+                        });
+
+                        L.marker([boat.lat, boat.lng], { icon }).addTo(this.map).bindPopup(`
+                            <div class="p-2">
+                                <h3 class="font-bold">${boat.name}</h3>
+                                <p class="text-sm">Type: ${boat.type.charAt(0).toUpperCase() + boat.type.slice(1)}</p>
+                                <p class="text-sm">Region: ${boat.region.toUpperCase()}</p>
+                                <p class="text-sm">Status: ${boat.status.charAt(0).toUpperCase() + boat.status.slice(1)}</p>
+                                <p class="text-sm">Coordinates: ${boat.lat.toFixed(4)}, ${boat.lng.toFixed(4)}</p>
+                            </div>
+                        `);
+                    });
+
+                } catch (error) {
+                    console.error('Map initialization failed:', error);
+                    document.getElementById('map').innerHTML = '<div class="flex items-center justify-center h-full text-red-600">Map failed to load. Please refresh the page.</div>';
+                }
+            }
+
+            initializeChart() {
+                const ctx = document.getElementById('sensor-chart').getContext('2d');
+                this.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Turbidity (NTU)',
+                            data: [],
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeInOutQuart'
+                        }
+                    }
+                });
+            }
+            
+            setupEventListeners() {
+                // Theme toggle
+                document.getElementById('theme-toggle').addEventListener('click', () => {
+                    this.toggleTheme();
+                });
+
+                // Auto-refresh toggle
+                document.getElementById('auto-refresh').addEventListener('change', (e) => {
+                    this.autoRefresh = e.target.checked;
+                });
+
+                // Settings modal
+                document.getElementById('settings-btn').addEventListener('click', () => {
+                    document.getElementById('settings-modal').classList.remove('hidden');
+                });
+
+                document.getElementById('close-settings').addEventListener('click', () => {
+                    document.getElementById('settings-modal').classList.add('hidden');
+                });
+
+                // Tab switching
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        this.switchTab(button.dataset.tab);
+                    });
+                });
+
+                // Header navigation links
+                document.querySelectorAll('.header-nav a').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.switchTab(link.dataset.tab);
+                    });
+                });
+
+                // Footer links
+                document.querySelectorAll('.footer-links a').forEach(link => {
+                    if (link.dataset.tab) {
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            this.switchTab(link.dataset.tab);
+                        });
+                    }
+                });
+
+                // Sensor selection
+                document.getElementById('sensor-select').addEventListener('change', (e) => {
+                    this.selectedSensor = e.target.value;
+                    this.updateChart();
+                });
+
+                // Buoy selection
+                document.getElementById('buoy-select').addEventListener('change', (e) => {
+                    this.selectedBuoy = e.target.value;
+                    this.updateChart();
+                });
+
+                // Region selection
+                document.getElementById('region-select').addEventListener('change', (e) => {
+                    this.selectedRegion = e.target.value;
+                    this.updateDetectionLogs();
+                });
+
+                // Device control buttons
+                document.getElementById('restart-buoy').addEventListener('click', () => {
+                    this.showToast('Buoy restart initiated', 'info');
+                });
+
+                document.getElementById('calibrate-sensors').addEventListener('click', () => {
+                    this.showToast('Sensor calibration started', 'info');
+                });
+
+                document.getElementById('update-firmware').addEventListener('click', () => {
+                    this.showToast('Firmware update in progress', 'info');
+                });
+
+                // Response buttons
+                document.getElementById('send-patrol').addEventListener('click', () => {
+                    this.showToast('Emergency patrol dispatched', 'success');
+                });
+
+                document.getElementById('deploy-retrieval').addEventListener('click', () => {
+                    this.showToast('Retrieval team deployed', 'success');
+                });
+
+                document.getElementById('notify-authorities').addEventListener('click', () => {
+                    this.showToast('All authorities notified', 'success');
+                });
+
+                // Filter logs button
+                document.getElementById('filter-logs').addEventListener('click', () => {
+                    this.showToast('Logs filtered by current selection', 'info');
+                });
+
+                // Refresh map button
+                document.getElementById('refresh-map').addEventListener('click', () => {
+                    this.refreshMap();
+                });
+
+                // Notifications button
+                document.getElementById('notifications-btn').addEventListener('click', () => {
+                    this.switchTab('notifications');
+                });
+
+                // Notification tabs
+                document.querySelectorAll('[data-notification-tab]').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tabId = button.dataset.notificationTab;
+                        this.showNotificationTab(tabId);
+                    });
+                });
+
+                // Close detection details modal
+                document.getElementById('close-detection-details').addEventListener('click', () => {
+                    document.getElementById('detection-details-modal').classList.add('hidden');
+                });
+            }
+
+            setupGhostNetReporting() {
+                // Get current location button
+                document.getElementById('get-current-location').addEventListener('click', () => {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition((position) => {
+                            document.getElementById('detection-lat').value = position.coords.latitude.toFixed(6);
+                            document.getElementById('detection-lng').value = position.coords.longitude.toFixed(6);
+                            this.showToast('Location obtained successfully', 'success');
+                        }, (error) => {
+                            this.showToast('Unable to get location: ' + error.message, 'error');
+                        });
+                    } else {
+                        this.showToast('Geolocation is not supported by this browser', 'error');
+                    }
+                });
+
+                // Photo upload
+                const photoUpload = document.getElementById('photo-upload');
+                const photoInput = document.getElementById('photo-input');
+                const photoPreview = document.getElementById('photo-preview');
+
+                photoUpload.addEventListener('click', () => {
+                    photoInput.click();
+                });
+
+                photoUpload.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    photoUpload.classList.add('dragover');
+                });
+
+                photoUpload.addEventListener('dragleave', () => {
+                    photoUpload.classList.remove('dragover');
+                });
+
+                photoUpload.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    photoUpload.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    this.handlePhotoUpload(files);
+                });
+
+                photoInput.addEventListener('change', (e) => {
+                    this.handlePhotoUpload(e.target.files);
+                });
+
+                // Form submission
+                document.getElementById('ghost-net-report-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.submitGhostNetReport();
+                });
+
+                // Quick action buttons
+                document.getElementById('emergency-hotline').addEventListener('click', () => {
+                    this.showToast('Connecting to emergency hotline...', 'info');
+                });
+
+                document.getElementById('coast-guard-direct').addEventListener('click', () => {
+                    this.showToast('Contacting Coast Guard directly...', 'info');
+                });
+
+                document.getElementById('nearby-vessels').addEventListener('click', () => {
+                    this.showToast('Alerting nearby vessels...', 'info');
+                });
+            }
+
+            handlePhotoUpload(files) {
+                const photoPreview = document.getElementById('photo-preview');
+                photoPreview.innerHTML = '';
+
+                Array.from(files).forEach((file, index) => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const img = document.createElement('div');
+                            img.className = 'relative';
+                            img.innerHTML = `
+                                <img src="${e.target.result}" class="w-full h-24 object-cover rounded border">
+                                <button type="button" onclick="this.parentElement.remove()" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">×</button>
+                            `;
+                            photoPreview.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            submitGhostNetReport() {
+                const formData = {
+                    reporterName: document.getElementById('reporter-name').value,
+                    reporterPhone: document.getElementById('reporter-phone').value,
+                    reporterOrg: document.getElementById('reporter-org').value,
+                    region: document.getElementById('detection-region').value,
+                    latitude: parseFloat(document.getElementById('detection-lat').value),
+                    longitude: parseFloat(document.getElementById('detection-lng').value),
+                    netSize: document.getElementById('net-size').value,
+                    severity: document.getElementById('severity-level').value,
+                    description: document.getElementById('net-description').value,
+                    marineImpact: {
+                        fish: document.getElementById('impact-fish').checked,
+                        turtle: document.getElementById('impact-turtle').checked,
+                        coral: document.getElementById('impact-coral').checked,
+                        other: document.getElementById('impact-other').checked
+                    },
+                    emergency: document.getElementById('emergency-contact').checked,
+                    timestamp: new Date().toISOString(),
+                    reportId: 'GNR-' + Date.now(),
+                    status: 'pending'
+                };
+
+                // Add to reports array
+                this.ghostNetReports.unshift(formData);
+
+                // Create alert
+                const alert = {
+                    id: Date.now(),
+                    type: 'Ghost Net Report',
+                    severity: formData.severity === 'critical' ? 'high' : formData.severity,
+                    buoy: 'USER-REPORT',
+                    time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+                    message: `Ghost net reported at ${formData.region} - ${formData.netSize} size, ${formData.severity} severity`,
+                    acknowledged: false,
+                    coordinates: `${formData.latitude}, ${formData.longitude}`,
+                    region: formData.region,
+                    timestamp: new Date().toISOString()
+                };
+
+                this.alerts.unshift(alert);
+
+                // Add to detection logs
+                const logEntry = {
+                    id: 'DET-' + Date.now(),
+                    time: new Date().toLocaleString(),
+                    buoyId: 'USER-REPORT',
+                    type: 'Ghost Net',
+                    region: formData.region,
+                    severity: formData.severity === 'critical' ? 'High' : formData.severity.charAt(0).toUpperCase() + formData.severity.slice(1),
+                    location: `${formData.region.toUpperCase()} (${formData.latitude.toFixed(4)}, ${formData.longitude.toFixed(4)})`,
+                    status: 'Active',
+                    details: formData.description,
+                    timestamp: new Date().toISOString()
+                };
+
+                this.detectionLogs.unshift(logEntry);
+
+                // Add ghost net to map
+                const color = formData.severity === 'high' || formData.severity === 'critical' ? '#ef4444' : 
+                            formData.severity === 'medium' ? '#f59e0b' : '#10b981';
+                const size = formData.netSize === 'massive' ? 16 : 
+                            formData.netSize === 'large' ? 12 : 
+                            formData.netSize === 'medium' ? 10 : 8;
+
+                const marker = L.marker([formData.latitude, formData.longitude], {
+                    icon: L.divIcon({
+                        html: `
+                            <div style="
+                                width: ${size}px;
+                                height: ${size}px;
+                                background: ${color};
+                                border: 2px solid white;
+                                border-radius: 3px;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                                animation: pulse 2s infinite;
+                            "></div>
+                            <style>
+                                @keyframes pulse {
+                                    0%, 100% { opacity: 1; transform: scale(1); }
+                                    50% { opacity: 0.7; transform: scale(1.1); }
+                                }
+                            </style>
+                        `,
+                        className: 'ghost-net-marker',
+                        iconSize: [size, size],
+                        iconAnchor: [size/2, size/2]
+                    })
+                }).addTo(this.map);
+
+                marker.bindPopup(`
+                    <div class="p-3 min-w-48">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                            <h3 class="font-bold text-red-600">Ghost Net Detected</h3>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>ID:</span>
+                                <span class="font-medium">${formData.reportId}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Region:</span>
+                                <span class="font-medium">${formData.region.toUpperCase()}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Size:</span>
+                                <span class="font-medium">${formData.netSize}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Severity:</span>
+                                <span class="font-semibold" style="color: ${color}">${formData.severity.toUpperCase()}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Status:</span>
+                                <span class="font-medium">Pending</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Reported:</span>
+                                <span class="font-medium">${new Date().toLocaleString()}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Coordinates:</span>
+                                <span class="font-medium">${formData.latitude.toFixed(4)}, ${formData.longitude.toFixed(4)}</span>
+                            </div>
+                            <div class="mt-3 space-y-1">
+                                <button onclick="app.deployResponse(${formData.latitude}, ${formData.longitude})" class="btn btn-primary text-xs w-full">Deploy Response</button>
+                                <button onclick="app.showDetectionDetails('${formData.reportId}')" class="btn btn-secondary text-xs w-full">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+                // Notify coastal authorities
+                this.notifyCoastalAuthorities(formData);
+
+                // Update displays
+                this.updateAlerts();
+                this.updateDetectionLogs();
+                this.updateRecentReports();
+                this.updateStatistics();
+                this.updateNotifications();
+
+                // Show success message
+                this.showToast('Ghost net report submitted successfully! Authorities have been notified.', 'success');
+
+                // Reset form
+                document.getElementById('ghost-net-report-form').reset();
+                document.getElementById('photo-preview').innerHTML = '';
+
+                // Auto-deploy response for high severity
+                if (formData.severity === 'high' || formData.severity === 'critical' || formData.emergency) {
+                    setTimeout(() => {
+                        this.deployResponse(formData.latitude, formData.longitude);
+                    }, 2000);
+                }
+            }
+
+            notifyCoastalAuthorities(reportData) {
+                const authorities = [
+                    { name: 'Indian Coast Guard', region: reportData.region, contact: '+91-1800-XXX-XXXX' },
+                    { name: 'Marine Police', region: reportData.region, contact: '+91-1800-YYY-YYYY' },
+                    { name: 'Port Authority', region: reportData.region, contact: '+91-1800-ZZZ-ZZZZ' }
+                ];
+
+                authorities.forEach(authority => {
+                    const notification = {
+                        id: Date.now() + Math.random(),
+                        authority: authority.name,
+                        region: authority.region,
+                        contact: authority.contact,
+                        reportId: reportData.reportId,
+                        message: `URGENT: Ghost net detection reported at coordinates ${reportData.latitude}, ${reportData.longitude}. Size: ${reportData.netSize}, Severity: ${reportData.severity}. Reporter: ${reportData.reporterName} (${reportData.reporterPhone}). ${reportData.emergency ? 'EMERGENCY RESPONSE REQUIRED!' : ''}`,
+                        timestamp: new Date().toISOString(),
+                        status: 'sent',
+                        read: false
+                    };
+
+                    this.authorityNotifications.unshift(notification);
+                });
+
+                this.updateAuthorityNotifications();
+            }
+
+            updateRecentReports() {
+                const container = document.getElementById('recent-reports');
+                container.innerHTML = this.ghostNetReports.slice(0, 5).map(report => `
+                    <div class="border border-gray-200 rounded-lg p-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium text-sm">${report.reportId}</span>
+                            <span class="report-status ${report.severity}">${report.severity.toUpperCase()}</span>
+                        </div>
+                        <div class="text-xs text-gray-600">
+                            <div>${report.region.toUpperCase()} - ${report.netSize} size</div>
+                            <div>Reporter: ${report.reporterName}</div>
+                            <div>${new Date(report.timestamp).toLocaleString()}</div>
+                        </div>
+                    </div>
+                `).join('') || '<div class="text-sm text-gray-500">No recent reports</div>';
+            }
+
+            updateAuthorityNotifications() {
+                const container = document.getElementById('authority-notifications');
+                container.innerHTML = this.authorityNotifications.slice(0, 10).map(notification => `
+                    <div class="notification-item ${!notification.read ? 'unread' : ''}">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="font-medium text-sm">${notification.authority}</span>
+                            <span class="text-xs text-gray-500">${new Date(notification.timestamp).toLocaleTimeString()}</span>
+                        </div>
+                        <div class="text-xs text-gray-600 mb-1">
+                            Region: ${notification.region.toUpperCase()} | Contact: ${notification.contact}
+                        </div>
+                        <div class="text-xs">${notification.message}</div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="badge badge-${notification.status === 'sent' ? 'success' : 'warning'}">${notification.status.toUpperCase()}</span>
+                            <span class="text-xs">Report: ${notification.reportId}</span>
+                        </div>
+                    </div>
+                `).join('') || '<div class="text-sm text-gray-500">No notifications</div>';
+            }
+
+            reportGhostNet(lat, lng, region) {
+                // Switch to reporting tab
+                this.switchTab('ghost-net-reporting');
+                
+                // Pre-fill coordinates and region
+                document.getElementById('detection-lat').value = lat.toFixed(6);
+                document.getElementById('detection-lng').value = lng.toFixed(6);
+                document.getElementById('detection-region').value = region.toLowerCase();
+                
+                this.showToast('Report form pre-filled with location data', 'info');
+            }
+
+            deployResponse(lat, lng) {
+                this.showToast(`Deploying emergency response to coordinates ${lat.toFixed(4)}, ${lng.toFixed(4)}`, 'success');
+                
+                // Add to communication log
+                const logEntry = {
+                    time: new Date().toLocaleTimeString(),
+                    source: 'System',
+                    message: `Emergency response deployed to ${lat.toFixed(4)}, ${lng.toFixed(4)}`
+                };
+                
+                // Update response status
+                setTimeout(() => {
+                    this.showToast('Coast Guard patrol boat dispatched - ETA 25 minutes', 'info');
+                }, 3000);
+            }
+
+            showDetectionDetails(detectionId) {
+                // Find the detection in logs
+                let detection;
+                
+                if (detectionId.startsWith('GN-')) {
+                    // Ghost net detection
+                    detection = {
+                        id: detectionId,
+                        type: 'Ghost Net',
+                        severity: 'High',
+                        status: 'Active',
+                        location: 'Mumbai Coast (19.0760, 72.8777)',
+                        timestamp: new Date().toISOString(),
+                        details: 'Large ghost net detected with multiple marine life entanglements. Immediate action required.',
+                        size: 'Large',
+                        region: 'mumbai',
+                        reporter: 'System Detection'
+                    };
+                } else if (detectionId.startsWith('GNR-')) {
+                    // Ghost net report
+                    const report = this.ghostNetReports.find(r => r.reportId === detectionId);
+                    if (report) {
+                        detection = {
+                            id: report.reportId,
+                            type: 'Ghost Net Report',
+                            severity: report.severity,
+                            status: 'Pending',
+                            location: `${report.region.toUpperCase()} (${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)})`,
+                            timestamp: report.timestamp,
+                            details: report.description,
+                            size: report.netSize,
+                            region: report.region,
+                            reporter: report.reporterName
+                        };
+                    }
+                } else if (detectionId.startsWith('DET-')) {
+                    // Detection log
+                    const log = this.detectionLogs.find(l => l.id === detectionId);
+                    if (log) {
+                        detection = {
+                            id: log.id,
+                            type: log.type,
+                            severity: log.severity,
+                            status: log.status,
+                            location: log.location,
+                            timestamp: log.timestamp,
+                            details: log.details || 'No additional details available',
+                            region: log.region,
+                            reporter: log.buoyId
+                        };
+                    }
+                }
+
+                if (!detection) {
+                    this.showToast('Could not find detection details', 'error');
+                    return;
+                }
+
+                // Populate modal content
+                const content = document.getElementById('detection-details-content');
+                content.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h3 class="font-medium">Detection ID</h3>
+                                <p>${detection.id}</p>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Type</h3>
+                                <p>${detection.type}</p>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Severity</h3>
+                                <p><span class="badge badge-${detection.severity === 'High' ? 'error' : detection.severity === 'Medium' ? 'warning' : 'success'}">${detection.severity}</span></p>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Status</h3>
+                                <p><span class="badge badge-${detection.status === 'Active' ? 'error' : detection.status === 'Investigating' ? 'warning' : 'success'}">${detection.status}</span></p>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Region</h3>
+                                <p>${detection.region.toUpperCase()}</p>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Detected By</h3>
+                                <p>${detection.reporter}</p>
+                            </div>
+                            ${detection.size ? `
+                            <div>
+                                <h3 class="font-medium">Size</h3>
+                                <p>${detection.size}</p>
+                            </div>
+                            ` : ''}
+                            <div>
+                                <h3 class="font-medium">Timestamp</h3>
+                                <p>${new Date(detection.timestamp).toLocaleString()}</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium">Location</h3>
+                            <p>${detection.location}</p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium">Details</h3>
+                            <p class="whitespace-pre-line">${detection.details}</p>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-gray-200">
+                            <button onclick="app.deployResponseFromModal('${detection.location.match(/\(([^)]+)\)/)[1]}')" class="btn btn-primary mr-2">
+                                Deploy Response
+                            </button>
+                            <button onclick="document.getElementById('detection-details-modal').classList.add('hidden')" class="btn btn-secondary">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Show modal
+                document.getElementById('detection-details-modal').classList.remove('hidden');
+            }
+
+            deployResponseFromModal(coordinates) {
+                const [lat, lng] = coordinates.split(',').map(coord => parseFloat(coord.trim()));
+                this.deployResponse(lat, lng);
+                document.getElementById('detection-details-modal').classList.add('hidden');
+            }
+
+            refreshMap() {
+                // In a real app, this would reload map data from the server
+                this.showToast('Map data refreshed', 'success');
+            }
+
+            loadInitialData() {
+                // Load sample alerts (only ghost net alerts)
+                this.alerts = [
+                    {
+                        id: 1,
+                        type: 'Ghost Net Detection',
+                        severity: 'high',
+                        buoy: 'B-032',
+                        time: '14:23',
+                        message: 'Large ghost net detected at Mumbai Coast',
+                        acknowledged: false,
+                        coordinates: '18.916090, 72.827426',
+                        region: 'mumbai',
+                        timestamp: '2024-01-15T14:23:00Z'
+                    },
+                    {
+                        id: 2,
+                        type: 'Ghost Net Detection',
+                        severity: 'critical',
+                        buoy: 'B-015',
+                        time: '13:45',
+                        message: 'Massive ghost net detected at Chennai Bay',
+                        acknowledged: false,
+                        coordinates: '13.027439, 80.267617',
+                        region: 'chennai',
+                        timestamp: '2024-01-15T13:45:00Z'
+                    }
+                ];
+
+                // Load sample detection logs (only ghost nets)
+                this.detectionLogs = [
+                    {
+                        id: 'DET-001',
+                        time: '2024-01-15 14:23',
+                        buoyId: 'B-032',
+                        type: 'Ghost Net',
+                        region: 'mumbai',
+                        severity: 'High',
+                        location: 'Mumbai Coast (18.916090, 72.827426)',
+                        status: 'Active',
+                        details: 'Large ghost net detected with multiple marine life entanglements. Immediate action required.',
+                        timestamp: '2024-01-15T14:23:00Z'
+                    },
+                    {
+                        id: 'DET-002',
+                        time: '2024-01-15 13:45',
+                        buoyId: 'B-015',
+                        type: 'Ghost Net',
+                        region: 'chennai',
+                        severity: 'Critical',
+                        location: 'Chennai Bay (13.027439, 80.267617)',
+                        status: 'Investigating',
+                        details: 'Massive ghost net detected with multiple marine life entanglements including dolphins. Emergency response required.',
+                        timestamp: '2024-01-15T13:45:00Z'
+                    },
+                    {
+                        id: 'DET-003',
+                        time: '2024-01-15 12:30',
+                        buoyId: 'B-028',
+                        type: 'Ghost Net',
+                        region: 'goa',
+                        severity: 'High',
+                        location: 'Goa Waters (15.259326, 73.923996)',
+                        status: 'Monitoring',
+                        details: 'Large ghost net detected. Possible fishing vessel lost net.',
+                        timestamp: '2024-01-15T12:30:00Z'
+                    },
+                    {
+                        id: 'DET-004',
+                        time: '2024-01-15 11:15',
+                        buoyId: 'B-067',
+                        type: 'Ghost Net',
+                        region: 'vizag',
+                        severity: 'Medium',
+                        location: 'Vizag Harbor (17.636816, 83.258482)',
+                        status: 'Resolved',
+                        details: 'Medium ghost net retrieved. Minimal marine life impact.',
+                        timestamp: '2024-01-15T11:15:00Z'
+                    },
+                    {
+                        id: 'DET-005',
+                        time: '2024-01-14 16:45',
+                        buoyId: 'B-032',
+                        type: 'Ghost Net',
+                        region: 'mumbai',
+                        severity: 'Medium',
+                        location: 'Mumbai Coast (18.926090, 72.837426)',
+                        status: 'Resolved',
+                        details: 'Ghost net successfully retrieved. No marine life casualties reported.',
+                        timestamp: '2024-01-14T16:45:00Z'
+                    },
+                    {
+                        id: 'DET-006',
+                        time: '2024-01-14 10:20',
+                        buoyId: 'B-015',
+                        type: 'Ghost Net',
+                        region: 'chennai',
+                        severity: 'High',
+                        location: 'Chennai Bay (13.047439, 80.277617)',
+                        status: 'Closed',
+                        details: 'Ghost net successfully retrieved. No marine life casualties reported.',
+                        timestamp: '2024-01-14T10:20:00Z'
+                    }
+                ];
+
+                // Load sample ghost net reports
+                this.ghostNetReports = [
+                    {
+                        reportId: 'GNR-001',
+                        reporterName: 'Fisherman Rajesh',
+                        reporterPhone: '+919876543210',
+                        reporterOrg: 'Local Fishermen Association',
+                        region: 'mumbai',
+                        latitude: 18.906090,
+                        longitude: 72.807426,
+                        netSize: 'large',
+                        severity: 'high',
+                        description: 'Found a large ghost net approximately 80m in size. Several fish and one turtle entangled. Net appears to be from a trawler.',
+                        marineImpact: {
+                            fish: true,
+                            turtle: true,
+                            coral: false,
+                            other: false
+                        },
+                        emergency: false,
+                        timestamp: '2024-01-15T14:23:00Z',
+                        status: 'investigating'
+                    },
+                    {
+                        reportId: 'GNR-002',
+                        reporterName: 'Coast Guard Patrol',
+                        reporterPhone: '+911800123456',
+                        reporterOrg: 'Indian Coast Guard',
+                        region: 'goa',
+                        latitude: 15.239326,
+                        longitude: 73.903996,
+                        netSize: 'massive',
+                        severity: 'critical',
+                        description: 'Massive ghost net approximately 150m in size spotted during routine patrol. Multiple marine species entangled including dolphins. Emergency response required.',
+                        marineImpact: {
+                            fish: true,
+                            turtle: true,
+                            coral: false,
+                            other: true
+                        },
+                        emergency: true,
+                        timestamp: '2024-01-15T12:30:00Z',
+                        status: 'active'
+                    }
+                ];
+
+                // Load sample system notifications (including sensor alerts)
+                this.systemNotifications = [
+                    {
+                        id: 'SYS-001',
+                        type: 'System Update',
+                        message: 'Scheduled maintenance will occur on January 20 from 02:00 to 04:00 IST',
+                        timestamp: '2024-01-10T09:00:00Z',
+                        read: false
+                    },
+                    {
+                        id: 'SYS-002',
+                        type: 'Firmware Update',
+                        message: 'New firmware version 2.3.1 available for buoys B-032 and B-028',
+                        timestamp: '2024-01-09T14:32:00Z',
+                        read: false
+                    },
+                    {
+                        id: 'SYS-003',
+                        type: 'Alert',
+                        message: 'Buoy B-067 battery level critical (15%). Please schedule replacement.',
+                        timestamp: '2024-01-08T11:15:00Z',
+                        read: true
+                    },
+                    {
+                        id: 'SYS-004',
+                        type: 'Sensor Alert',
+                        message: 'High turbidity detected at buoy B-015 (65 NTU)',
+                        timestamp: '2024-01-15T13:45:00Z',
+                        read: false
+                    },
+                    {
+                        id: 'SYS-005',
+                        type: 'Sensor Alert',
+                        message: 'Vibration detected at buoy B-028 (0.8g)',
+                        timestamp: '2024-01-15T12:30:00Z',
+                        read: false
+                    },
+                    {
+                        id: 'SYS-006',
+                        type: 'Sensor Alert',
+                        message: 'pH level alert at buoy B-067 (8.2)',
+                        timestamp: '2024-01-15T11:15:00Z',
+                        read: false
+                    }
+                ];
+
+                this.updateAlerts();
+                this.updateDetectionLogs();
+                this.updateChart();
+                this.updateRecentReports();
+                this.updateAuthorityNotifications();
+                this.updateStatistics();
+                this.updateNotifications();
+            }
+
+            updateAlerts() {
+                const container = document.getElementById('alerts-container');
+                const count = document.getElementById('alert-count');
+                
+                const unacknowledgedAlerts = this.alerts.filter(alert => !alert.acknowledged);
+                count.textContent = unacknowledgedAlerts.length;
+                count.classList.toggle('hidden', unacknowledgedAlerts.length === 0);
+                
+                container.innerHTML = this.alerts.map(alert => `
+                    <div class="alert alert-${alert.severity === 'high' ? 'error' : alert.severity === 'medium' ? 'warning' : 'info'}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-medium text-sm">${alert.type}</div>
+                                <div class="text-xs mt-1">${alert.message}</div>
+                                <div class="text-xs mt-1 opacity-75">${alert.buoy} • ${alert.time}</div>
+                                <div class="text-xs mt-1 opacity-75">📍 ${alert.coordinates}</div>
+                                <div class="text-xs mt-1 opacity-75">Region: ${alert.region.toUpperCase()}</div>
+                            </div>
+                            <button class="btn btn-secondary text-xs" onclick="app.acknowledgeAlert(${alert.id})">
+                                ${alert.acknowledged ? 'Acknowledged' : 'Acknowledge'}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            updateDetectionLogs() {
+                const tbody = document.getElementById('detection-logs-tbody');
+                
+                // Filter logs by selected region
+                let filteredLogs = this.detectionLogs;
+                if (this.selectedRegion !== 'all') {
+                    filteredLogs = this.detectionLogs.filter(log => log.region === this.selectedRegion);
+                }
+                
+                tbody.innerHTML = filteredLogs.map(log => `
+                    <tr>
+                        <td>${log.time}</td>
+                        <td>${log.buoyId}</td>
+                        <td>${log.type}</td>
+                        <td>${log.region.toUpperCase()}</td>
+                        <td>
+                            <span class="badge badge-${log.severity === 'High' || log.severity === 'Critical' ? 'error' : log.severity === 'Medium' ? 'warning' : 'success'}">
+                                ${log.severity}
+                            </span>
+                        </td>
+                        <td>${log.location}</td>
+                        <td>
+                            <span class="badge badge-${log.status === 'Active' ? 'error' : log.status === 'Investigating' ? 'warning' : 'success'}">
+                                ${log.status}
+                            </span>
+                        </td>
+                        <td>
+                            <button onclick="app.showDetectionDetails('${log.id}')" class="btn btn-secondary text-xs">View Details</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            updateStatistics() {
+                const totalDetections = this.ghostNetReports.length + 12; // 12 existing detections
+                const successfulRemovals = Math.floor(totalDetections * 0.78);
+                const pendingRemovals = totalDetections - successfulRemovals;
+                const successRate = Math.floor((successfulRemovals / totalDetections) * 100);
+
+                document.getElementById('total-detections').textContent = totalDetections;
+                document.getElementById('successful-removals').textContent = successfulRemovals;
+                document.getElementById('pending-removals').textContent = pendingRemovals;
+                document.getElementById('success-rate').textContent = successRate + '%';
+            }
+
+            updateNotifications() {
+                // Update alerts notifications
+                const alertsContainer = document.getElementById('alerts-notifications');
+                const unreadAlerts = this.alerts.filter(alert => !alert.acknowledged);
+                
+                alertsContainer.innerHTML = unreadAlerts.length > 0 ? 
+                    unreadAlerts.map(alert => `
+                        <div class="notification-item unread">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-medium text-sm">${alert.type}</span>
+                                <span class="text-xs text-gray-500">${new Date(alert.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                            <div class="text-xs">${alert.message}</div>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="badge badge-${alert.severity === 'high' ? 'error' : alert.severity === 'medium' ? 'warning' : 'success'}">${alert.severity.toUpperCase()}</span>
+                                <button onclick="app.acknowledgeAlert(${alert.id})" class="text-xs text-blue-600">Acknowledge</button>
+                            </div>
+                        </div>
+                    `).join('') : 
+                    '<div class="text-sm text-gray-500 text-center py-4">No unread alerts</div>';
+                
+                // Update reports notifications
+                const reportsContainer = document.getElementById('reports-notifications');
+                const recentReports = this.ghostNetReports.slice(0, 5);
+                
+                reportsContainer.innerHTML = recentReports.length > 0 ? 
+                    recentReports.map(report => `
+                        <div class="notification-item">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-medium text-sm">Ghost Net Report</span>
+                                <span class="text-xs text-gray-500">${new Date(report.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                            <div class="text-xs text-gray-600 mb-1">
+                                ${report.region.toUpperCase()} - ${report.netSize} size - ${report.severity} severity
+                            </div>
+                            <div class="text-xs">Reported by ${report.reporterName}</div>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="badge badge-${report.severity === 'high' || report.severity === 'critical' ? 'error' : report.severity === 'medium' ? 'warning' : 'success'}">${report.severity.toUpperCase()}</span>
+                                <button onclick="app.showDetectionDetails('${report.reportId}')" class="text-xs text-blue-600">View Details</button>
+                            </div>
+                        </div>
+                    `).join('') : 
+                    '<div class="text-sm text-gray-500 text-center py-4">No recent reports</div>';
+                
+                // Update authorities notifications
+                const authoritiesContainer = document.getElementById('authorities-notifications-tab');
+                const unreadAuthorities = this.authorityNotifications.filter(n => !n.read);
+                
+                authoritiesContainer.innerHTML = unreadAuthorities.length > 0 ? 
+                    unreadAuthorities.map(notification => `
+                        <div class="notification-item unread">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-medium text-sm">${notification.authority}</span>
+                                <span class="text-xs text-gray-500">${new Date(notification.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                            <div class="text-xs text-gray-600 mb-1">
+                                Region: ${notification.region.toUpperCase()}
+                            </div>
+                            <div class="text-xs">${notification.message}</div>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="badge badge-${notification.status === 'sent' ? 'success' : 'warning'}">${notification.status.toUpperCase()}</span>
+                                <span class="text-xs">Report: ${notification.reportId}</span>
+                            </div>
+                        </div>
+                    `).join('') : 
+                    '<div class="text-sm text-gray-500 text-center py-4">No authority notifications</div>';
+                
+                // Update system notifications (including sensor alerts)
+                const systemContainer = document.getElementById('system-notifications');
+                const unreadSystem = this.systemNotifications.filter(n => !n.read);
+                
+                systemContainer.innerHTML = this.systemNotifications.length > 0 ? 
+                    this.systemNotifications.map(notification => `
+                        <div class="notification-item ${!notification.read ? 'unread' : ''}">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-medium text-sm">${notification.type}</span>
+                                <span class="text-xs text-gray-500">${new Date(notification.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                            <div class="text-xs">${notification.message}</div>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-xs text-gray-600">${new Date(notification.timestamp).toLocaleDateString()}</span>
+                                ${!notification.read ? '<button onclick="app.markNotificationAsRead(\'' + notification.id + '\')" class="text-xs text-blue-600">Mark as Read</button>' : ''}
+                            </div>
+                        </div>
+                    `).join('') : 
+                    '<div class="text-sm text-gray-500 text-center py-4">No system notifications</div>';
+                
+                // Update badge counts
+                document.getElementById('alerts-badge').textContent = unreadAlerts.length;
+                document.getElementById('alerts-badge').classList.toggle('hidden', unreadAlerts.length === 0);
+                
+                document.getElementById('reports-badge').textContent = recentReports.length;
+                document.getElementById('reports-badge').classList.toggle('hidden', recentReports.length === 0);
+                
+                document.getElementById('authorities-badge').textContent = unreadAuthorities.length;
+                document.getElementById('authorities-badge').classList.toggle('hidden', unreadAuthorities.length === 0);
+                
+                document.getElementById('system-badge').textContent = unreadSystem.length;
+                document.getElementById('system-badge').classList.toggle('hidden', unreadSystem.length === 0);
+            }
+
+            showNotificationTab(tabId) {
+                // Hide all notification panels
+                document.querySelectorAll('[id$="-notifications"]').forEach(panel => {
+                    if (panel.id !== 'alerts-notifications' && panel.id !== 'reports-notifications' && 
+                        panel.id !== 'authorities-notifications-tab' && panel.id !== 'system-notifications') {
+                        return;
+                    }
+                    panel.classList.add('hidden');
+                });
+                
+                // Remove active class from all buttons
+                document.querySelectorAll('.notification-tab-button').forEach(button => {
+                    button.classList.remove('active');
+                });
+                
+                // Show selected panel and activate button
+                document.getElementById(`${tabId}-notifications`).classList.remove('hidden');
+                document.querySelector(`[data-notification-tab="${tabId}"]`).classList.add('active');
+            }
+
+            updateChart() {
+                // Generate sample data based on selected sensor
+                const labels = [];
+                const data = [];
+                const now = new Date();
+                
+                for (let i = 23; i >= 0; i--) {
+                    const time = new Date(now.getTime() - i * 60 * 60 * 1000);
+                    labels.push(time.getHours() + ':00');
+                    
+                    let value;
+                    switch (this.selectedSensor) {
+                        case 'turbidity':
+                            value = 30 + Math.random() * 40 + Math.sin(i * 0.5) * 10;
+                            break;
+                        case 'temperature':
+                            value = 25 + Math.random() * 10 + Math.sin(i * 0.3) * 3;
+                            break;
+                        case 'pressure':
+                         value = 1000 + Math.random() * 50 + Math.sin(i * 0.2) * 20;
+                        break;
+                    case 'salinity':
+                        value = 35 + Math.random() * 5 + Math.sin(i * 0.4) * 2;
+                        break;
+                    case 'tds':
+                        value = 400 + Math.random() * 200 + Math.sin(i * 0.3) * 50;
+                        break;
+                    default:
+                        value = Math.random() * 100;
+                }
+                data.push(Math.max(0, value));
+            }
+
+            this.chart.data.labels = labels;
+            this.chart.data.datasets[0].data = data;
+            this.chart.data.datasets[0].label = this.getSensorLabel(this.selectedSensor);
+            this.chart.update('none');
+        }
+
+        getSensorLabel(sensor) {
+            const labels = {
+                turbidity: 'Turbidity (NTU)',
+                temperature: 'Temperature (°C)',
+                pressure: 'Pressure (hPa)',
+                salinity: 'Salinity (PSU)',
+                tds: 'Total Dissolved Solids (ppm)',
+            };
+            return labels[sensor] || sensor;
+        }
+
+        switchTab(tabId) {
+            this.currentTab = tabId;
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Add active class to clicked button
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            
+            // If switching to notifications tab, show alerts by default
+            if (tabId === 'notifications') {
+                this.showNotificationTab('alerts');
+            }
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        acknowledgeAlert(alertId) {
+            const alert = this.alerts.find(a => a.id === alertId);
+            if (alert) {
+                alert.acknowledged = true;
+                this.updateAlerts();
+                this.updateNotifications();
+                this.showToast('Alert acknowledged', 'success');
+            }
+        }
+
+        markNotificationAsRead(notificationId) {
+            const notification = this.systemNotifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                this.updateNotifications();
+                this.showToast('Notification marked as read', 'success');
+            }
+        }
+
+        toggleTheme() {
+            this.isDarkMode = !this.isDarkMode;
+            document.body.classList.toggle('dark', this.isDarkMode);
+            
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            
+            if (this.isDarkMode) {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        }
+
+        showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} animate-pulse`;
+            toast.textContent = message;
+            
+            document.getElementById('toast-container').appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        startAutoRefresh() {
+            setInterval(() => {
+                if (this.autoRefresh) {
+                    this.updateChart();
+                    // Simulate new data
+                    if (Math.random() < 0.05) { // 5% chance of new alert
+                        this.simulateNewAlert();
+                    }
+                }
+            }, 5000);
+        }
+
+        simulateNewAlert() {
+            const types = ['Ghost Net Detection'];
+            const severities = ['high', 'medium', 'low'];
+            const buoys = ['B-032', 'B-015', 'B-028', 'B-067'];
+            const regions = ['mumbai', 'chennai', 'goa', 'vizag'];
+            const regionNames = ['Mumbai Coast', 'Chennai Bay', 'Goa Waters', 'Vizag Harbor'];
+            
+            const regionIndex = Math.floor(Math.random() * regions.length);
+            const region = regions[regionIndex];
+            const regionName = regionNames[regionIndex];
+            
+            const newAlert = {
+                id: Date.now(),
+                type: types[Math.floor(Math.random() * types.length)],
+                severity: severities[Math.floor(Math.random() * severities.length)],
+                buoy: buoys[Math.floor(Math.random() * buoys.length)],
+                time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+                message: `Automated detection at ${regionName}`,
+                acknowledged: false,
+                coordinates: `${(15 + Math.random() * 10).toFixed(4)}, ${(70 + Math.random() * 15).toFixed(4)}`,
+                region: region,
+                timestamp: new Date().toISOString()
+            };
+            
+            this.alerts.unshift(newAlert);
+            
+            // Also add to detection logs
+            const logEntry = {
+                id: 'DET-' + Date.now(),
+                time: new Date().toLocaleString(),
+                buoyId: newAlert.buoy,
+                type: newAlert.type,
+                region: newAlert.region,
+                severity: newAlert.severity.charAt(0).toUpperCase() + newAlert.severity.slice(1),
+                location: `${regionName.toUpperCase()} (${newAlert.coordinates})`,
+                status: 'Active',
+                timestamp: new Date().toISOString()
+            };
+            
+            this.detectionLogs.unshift(logEntry);
+            
+            this.updateAlerts();
+            this.updateDetectionLogs();
+            this.updateNotifications();
+        }
+    }
+
+    // Initialize the application
+    const app = new MarineMonitoringSystem();
+</script>
+</body> </html> 
