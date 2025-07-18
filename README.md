@@ -159,7 +159,7 @@ integrated with wokwi:(https://faisal-14.github.io/Website/)
 ## 📺 YouTube Demo
 
 Watch our full project demo on YouTube:
-(https://thingspeak.com/channels/3011293)
+https://youtu.be/efNZt9W_u58?si=fbjrqM-KzkpoW2bF
 
 
 
