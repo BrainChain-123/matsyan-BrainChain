@@ -130,7 +130,7 @@ The web interface is under development. Once live, the flow will be:
    - **Real-time map showing device location**
 
 🔗 Web App Link integrates with Wokwi: 
-
+(https://faisal-14.github.io/Website/)
 
 
 🔗 Web App Link will be integrated with hardware:
@@ -152,17 +152,14 @@ The web interface is under development. Once live, the flow will be:
 - [🔗 Wokwi ESP32 + Sensor Simulation](https://wokwi.com/projects/436428149476432897)
 
 ### 🖥️ Web Interface
-
-
-
+Will be integrated with hardware:(https://faisal-14.github.io/Marine/)
+integrated with wokwi:(https://faisal-14.github.io/Website/)
 
 
 ## 📺 YouTube Demo
 
-Watch our full project demo on YouTube:  
-[🎥 Click to Watch]
-
-
+Watch our full project demo on YouTube:
+(https://thingspeak.com/channels/3011293)
 
 
 
