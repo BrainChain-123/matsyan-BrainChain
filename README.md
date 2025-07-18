@@ -134,8 +134,7 @@ The web interface is under development. Once live, the flow will be:
 
 
 🔗 Web App Link will be integrated with hardware:
-
-
+(https://faisal-14.github.io/Marine/)
 ---
 
 ### 🛠️ Developer Testing 
