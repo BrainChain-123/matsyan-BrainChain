@@ -61,11 +61,11 @@ The web interface is under development. Once live, the flow will be:
    - **Ghost net detection alerts**
    - **Real-time map showing device location**
 
-🔗 Web App Link: 
+🔗 Web App Link integrates with Wokwi: 
 
 
 
-
+🔗 Web App Link will be integrated with hardware:
 
 
 ---
